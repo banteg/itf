@@ -10,10 +10,15 @@ def shows_availabe():
 
     atv = requests.get('https://appletv.itunesfestival.com/1b/en-GB/gb.json').json()['video_dict']
     vods = [atv[x] for x in atv if x.startswith('vod')]
+    shows = []
 
     for show in vods:
         tag, artist = re.search('201409(\d{2})/v\d/(.*)_atv_vod\.m3u8', show['url']).groups()
-        print('{}\npython itf.py {} {}\n'.format(show['title'], tag, artist))
+        shows.append((show['title'], tag, artist))
+
+    shows = sorted(shows, key=lambda x: x[1])
+    for show in shows:
+        print('{}\npython itf.py {} {}\n'.format(*show))
 
 
 def download_show():

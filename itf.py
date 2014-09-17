@@ -5,7 +5,7 @@ import re
 print('iTunes Festival London 2014 Downloader\n')
 
 
-def shows_availabe():
+def shows_available():
     print('Shows available to download:\n')
 
     atv = requests.get('https://appletv.itunesfestival.com/1b/en-GB/gb.json').json()['video_dict']
@@ -48,6 +48,6 @@ def download_show():
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        shows_availabe()
+        shows_available()
     else:
         download_show()

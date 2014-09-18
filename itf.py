@@ -18,7 +18,7 @@ def usage():
     python itf.py <day> <artist> [quality]
 
 Options:
-    quality  720p, 1080p or ac3 (default: 1080p)''')
+    quality  1080p, 720p or ac3 (default: 1080p)''')
 
 
 def shows_available():
@@ -42,7 +42,6 @@ def download_show(tag, artist, quality='1080p'):
     token = requests.get('http://itunes.apple.com/apps1b/authtoken/token.txt').text
     cookies = {'token': token}
     output = artist.split('_')[-1] + ext
-    open(output, 'w').close()
 
     files_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201409{}/v1/{}/{}_vod.m3u8'.format(tag, stream, artist)
     files = requests.get(files_url, cookies=cookies)
@@ -51,6 +50,7 @@ def download_show(tag, artist, quality='1080p'):
 
     total = len(files)
     print('Downloading {} parts to {}'.format(total, output))
+    open(output, 'w').close()
 
     for c, part in enumerate(files, start=1):
         print('Downlading part {}/{} {}'.format(c, total, part))

@@ -13,9 +13,9 @@ QUALITY = {
 
 def usage():
     print('''Usage:
-    python itf.py
-    python itf.py shows
-    python itf.py <day> <artist> [quality]
+    itf
+    itf shows
+    itf <day> <artist> [quality]
 
 Options:
     quality  1080p, 720p or ac3 (default: 1080p)''')
@@ -34,7 +34,7 @@ def shows_available():
 
     shows = sorted(shows, key=lambda x: x[1])
     for show in shows:
-        print('{}\npython itf.py {} {}\n'.format(*show))
+        print('{}\nitf {} {}\n'.format(*show))
 
 
 def download_show(tag, artist, quality='1080p'):
@@ -62,7 +62,7 @@ def download_show(tag, artist, quality='1080p'):
     print('Done! Enjoy the show.')
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) == 2:
         shows_available()
     elif len(sys.argv) == 3:
@@ -76,3 +76,7 @@ if __name__ == '__main__':
         download_show(tag, artist, quality=quality)
     else:
         usage()
+
+
+if __name__ == '__main__':
+    main()

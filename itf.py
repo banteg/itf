@@ -1,8 +1,8 @@
+from __future__ import unicode_literals, print_function
 import requests
 import sys
-import re
 
-print('iTunes Festival London 2014 Downloader\n')
+print('Apple Music Festival 2015 Downloader\n')
 
 QUALITY = {
     '1080p': ('8500_256', '.ts'),
@@ -13,49 +13,49 @@ QUALITY = {
 
 def usage():
     print('''Usage:
-    itf
-    itf shows
     itf <day> <artist> [quality]
 
 Options:
     quality  1080p, 720p or ac3 (default: 1080p)''')
 
 
-def shows_available():
-    print('Shows available to download:\n')
-
-    atv = requests.get('https://appletv.itunesfestival.com/1b/en-GB/gb.json').json()['video_dict']
-    vods = [atv[x] for x in atv if x.startswith('vod')]
-    shows = []
-
-    for show in vods:
-        tag, artist = re.search('201409(\d{2})/v\d/(.*)_atv_vod\.m3u8', show['url']).groups()
-        shows.append((show['title'], tag, artist))
-
-    shows = sorted(shows, key=lambda x: x[1])
-    for show in shows:
-        print('{}\nitf {} {}\n'.format(*show))
+def get_artist_id(artist):
+    params = dict(term=artist, entity='musicArtist', attribute='artistTerm', limit=1)
+    resp = requests.get('https://itunes.apple.com/search', params=params)
+    id = resp.json()['results'][0]['artistId']
+    id_artist = '{}_{}'.format(id, artist)
+    return id_artist
 
 
 def download_show(tag, artist, quality='1080p'):
     stream, ext = QUALITY[quality]
-    token = requests.get('http://itunes.apple.com/apps1b/authtoken/token.txt').text
+
+    if '_' not in artist:
+        artist = get_artist_id(artist)
+
+    token = requests.get('https://itunes.apple.com/apps1b/authtoken/token.txt').text
     cookies = {'token': token}
-    output = artist.split('_')[-1] + ext
 
-    files_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201409{}/v1/{}/{}_vod.m3u8'.format(tag, stream, artist)
-    files = requests.get(files_url, cookies=cookies)
+    output = '{}_{}_{}{}'.format(tag, artist, quality, ext)
 
-    files = [i for i in files.text.splitlines() if not i.startswith('#')]
+    files_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201509{}/v1/{}/{}_vod.m3u8'
+    files = requests.get(files_url.format(tag, stream, artist), cookies=cookies, allow_redirects=False)
+
+    if 'performance_not_available' in files.headers.get('location', ''):
+        print('Not available in your country, use proxy.')
+        return
+
+    files = [i for i in files.text.splitlines() if 'song' in i]
 
     total = len(files)
     print('Downloading {} parts to {}'.format(total, output))
+
     open(output, 'w').close()
 
-    for c, part in enumerate(files, start=1):
+    for c, part in enumerate(files, 1):
         print('Downlading part {}/{} {}'.format(c, total, part))
-        part_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201409{}/v1/{}/{}'.format(tag, stream, part)
-        data = requests.get(part_url, cookies=cookies)
+        part_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201509{}/v1/{}/{}'
+        data = requests.get(part_url.format(tag, stream, part), cookies=cookies)
         with open(output, 'ab') as f:
             f.write(data.content)
 
@@ -63,14 +63,12 @@ def download_show(tag, artist, quality='1080p'):
 
 
 def main():
-    if len(sys.argv) == 2:
-        shows_available()
-    elif len(sys.argv) == 3:
+    if len(sys.argv) == 3:
         _, tag, artist = sys.argv
         download_show(tag, artist)
     elif len(sys.argv) == 4:
         _, tag, artist, quality = sys.argv
-        if not quality in QUALITY:
+        if quality not in QUALITY:
             print('Warning: unknown quality, defaulting to 1080p')
             quality = '1080p'
         download_show(tag, artist, quality=quality)

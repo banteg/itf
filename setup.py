@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='itf',
-    version='1.2.0',
-    description='Download iTunes Festival London 2014 Streams',
-    url='https://gist.github.com/banteg/105bfb581bfa5c738312',
+    version='2.0',
+    description='Download Apple Music Festival 2015 Streams',
+    url='https://github.com/banteg/itf',
     py_modules=['itf'],
     install_requires=['requests'],
     entry_points={

@@ -53,7 +53,8 @@ def generate_chapters(m3u8):
 @click.argument('quality', default='1080p', type=click.Choice(['1080p', '720p', 'ac3']))
 @click.option('--dump', '-d', is_flag=True, help='dump instead of downloading')
 @click.option('--proxy', '-p', help='use http proxy')
-def main(day, artist, quality, dump, proxy):
+@click.option('--chapters', '-c', is_flag=True, help='generate chapters')
+def main(day, artist, quality, dump, proxy, chapters):
     '''
     Apple Music Festival 2015 Downloader
     '''
@@ -76,18 +77,24 @@ def main(day, artist, quality, dump, proxy):
     output = '{}_{}_{}{}'.format(day, artist, quality, ext)
 
     files_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201509{}/v1/{}/{}_vod.m3u8'
-    files = requests.get(files_url.format(day, stream, artist), cookies=cookies, allow_redirects=False, proxies=proxies)
+    m3u8 = requests.get(files_url.format(day, stream, artist), cookies=cookies, allow_redirects=False, proxies=proxies)
 
-    if 'performance_not_available' in files.headers.get('location', ''):
+    if 'performance_not_available' in m3u8.headers.get('location', ''):
         click.secho('Not available in your country, use proxy.', fg='red')
         return
 
-    files = [i for i in files.text.splitlines() if 'song' in i]
+    files = [i for i in m3u8.text.splitlines() if 'song' in i]
 
     total = len(files)
     if total == 0:
         click.secho('Recoding not available', fg='red')
         return
+
+    if chapters:
+        chapters_name = output.replace(ext, '_chapters.txt')
+        with open(chapters_name, 'wt') as f:
+            f.write(generate_chapters(m3u8.text))
+        click.secho('Saved chapters to {}'.format(chapters_name), fg='green')
 
     if dump:
         with open('{}.txt'.format(output), 'wt') as f:

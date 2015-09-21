@@ -47,6 +47,22 @@ def generate_chapters(m3u8):
     return '\n'.join(chapters)
 
 
+def save_dump(token, basename, m3u8, urls):
+    with open('token.txt', 'wt') as f:
+            f.write('token={}'.format(token))
+
+    m3u8_name = '{}.m3u8'.format(basename)
+    with open(m3u8_name, 'wt') as f:
+        f.write(m3u8)
+    click.secho('Saved HLS playlist to {}'.format(m3u8_name), fg='green')
+
+    urls_name = '{}.urls'.format(basename)
+    with open(urls_name, 'wt') as f:
+        f.write('\n'.join(urls))
+    click.secho('Saved URLs to {}'.format(urls_name), fg='green')
+    return
+
+
 @click.command()
 @click.argument('day', type=click.IntRange(19, 28))
 @click.argument('artist')
@@ -69,10 +85,6 @@ def main(day, artist, quality, dump, proxy, chapters):
 
     token = requests.get('https://itunes.apple.com/apps1b/authtoken/token.txt', proxies=proxies).text.strip()
     cookies = {'token': token}
-
-    if dump:
-        with open('token.txt', 'wt') as f:
-            f.write('token={}'.format(token))
 
     output = '{}_{}_{}{}'.format(day, artist, quality, ext)
 
@@ -100,15 +112,7 @@ def main(day, artist, quality, dump, proxy, chapters):
         click.secho('Saved chapters to {}'.format(chapters_name), fg='green')
 
     if dump:
-        m3u8_name = '{}'.format(output.replace(ext, '.m3u8'))
-        with open(m3u8_name, 'wt') as f:
-            f.write(m3u8.text)
-        click.secho('Saved HLS playlist to {}'.format(m3u8_name), fg='green')
-
-        urls_name = '{}'.format(output.replace(ext, '.urls'))
-        with open(urls_name, 'wt') as f:
-            f.write('\n'.join(part_urls))
-        click.secho('Saved URLs to {}'.format(urls_name), fg='green')
+        save_dump(token, output.replace(ext, ''), m3u8.text, part_urls)
         return
 
     click.echo('Downloading {} parts to {}'.format(total, output))
@@ -122,6 +126,7 @@ def main(day, artist, quality, dump, proxy, chapters):
                 f.write(data.content)
 
     click.secho('Done! Enjoy the show.', fg='green')
+    click.secho('\nHave an idea? https://github.com/banteg/itf')
 
 
 if __name__ == '__main__':

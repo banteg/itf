@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 import requests
-import sys
+import click
 
 print('Apple Music Festival 2015 Downloader\n')
 
@@ -11,14 +11,6 @@ QUALITY = {
 }
 
 
-def usage():
-    print('''Usage:
-    itf <day> <artist> [quality]
-
-Options:
-    quality  1080p, 720p or ac3 (default: 1080p)''')
-
-
 def get_artist_id(artist):
     params = dict(term=artist, entity='musicArtist', attribute='artistTerm', limit=1)
     resp = requests.get('https://itunes.apple.com/search', params=params)
@@ -27,7 +19,11 @@ def get_artist_id(artist):
     return id_artist
 
 
-def download_show(tag, artist, quality='1080p'):
+@click.command()
+@click.argument('tag')
+@click.argument('artist')
+@click.argument('quality', default='1080p', type=click.Choice(['1080p', '720p', 'ac3']))
+def main(tag, artist, quality):
     stream, ext = QUALITY[quality]
 
     if '_' not in artist:
@@ -60,20 +56,6 @@ def download_show(tag, artist, quality='1080p'):
             f.write(data.content)
 
     print('Done! Enjoy the show.')
-
-
-def main():
-    if len(sys.argv) == 3:
-        _, tag, artist = sys.argv
-        download_show(tag, artist)
-    elif len(sys.argv) == 4:
-        _, tag, artist, quality = sys.argv
-        if quality not in QUALITY:
-            print('Warning: unknown quality, defaulting to 1080p')
-            quality = '1080p'
-        download_show(tag, artist, quality=quality)
-    else:
-        usage()
 
 
 if __name__ == '__main__':

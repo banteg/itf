@@ -85,6 +85,9 @@ def main(day, artist, quality, dump, proxy, chapters):
 
     files = [i for i in m3u8.text.splitlines() if 'song' in i]
 
+    part_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201509{}/v1/{}/{}'
+    part_urls = [part_url.format(day, stream, part) for part in files]
+
     total = len(files)
     if total == 0:
         click.secho('Recoding not available', fg='red')
@@ -101,16 +104,20 @@ def main(day, artist, quality, dump, proxy, chapters):
         with open(m3u8_name, 'wt') as f:
             f.write(m3u8.text)
         click.secho('Saved HLS playlist to {}'.format(m3u8_name), fg='green')
+
+        urls_name = '{}'.format(output.replace(ext, '.urls'))
+        with open(urls_name, 'wt') as f:
+            f.write('\n'.join(part_urls))
+        click.secho('Saved URLs to {}'.format(urls_name), fg='green')
         return
 
     click.echo('Downloading {} parts to {}'.format(total, output))
 
     open(output, 'w').close()
 
-    with click.progressbar(files, show_pos=True) as bar:
+    with click.progressbar(part_urls, show_pos=True) as bar:
         for c, part in enumerate(bar, 1):
-            part_url = 'http://streaming.itunesfestival.com/auth/eu1/vod/201509{}/v1/{}/{}'
-            data = requests.get(part_url.format(day, stream, part), cookies=cookies, proxies=proxies)
+            data = requests.get(part, cookies=cookies, proxies=proxies)
             with open(output, 'ab') as f:
                 f.write(data.content)
 

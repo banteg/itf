@@ -31,7 +31,7 @@ def get_artist_id(artist):
 @click.argument('artist')
 @click.argument('quality', default='1080p', type=click.Choice(['1080p', '720p', 'ac3']))
 @click.option('--dump', '-d', is_flag=True, help='dump instead of downloading')
-@click.option('--proxy', '-p', help='specify http proxy')
+@click.option('--proxy', '-p', help='use http proxy')
 def main(day, artist, quality, dump, proxy):
     '''
     Apple Music Festival 2015 Downloader
@@ -50,7 +50,7 @@ def main(day, artist, quality, dump, proxy):
 
     if dump:
         with open('token.txt', 'wt') as f:
-            f.write('token={}'.format(token))
+            f.write('token={}'.format(token.strip()))
 
     output = '{}_{}_{}{}'.format(day, artist, quality, ext)
 

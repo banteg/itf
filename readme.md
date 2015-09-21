@@ -18,6 +18,8 @@ pip install -U itf
 
 `-d or --dump` dump token and parts instead of downloading, useful if you don't like sequential downloads
 
+`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it all with mkvmerge
+
 ### Examples
 To download AC3 audio stream for Ellie Goulding, type
 ```
@@ -29,15 +31,16 @@ To download 1080p performance of Take That via Tor, type:
 itf 20 takethat -p 127.0.0.1:9050
 ```
 
-To dump urls for later use, type:
+To dump hls playlist, urls and chapters for later use, type:
 ```
-itf 19 andraday 720p --dump
+itf 19 andraday 720p --dump --chapters
 ```
 Then you can download and merge parts:
 ```
 aria2c -c -j 10 --header="Cookie: {token.txt}" -i parts.txt
 cat *.ts > andraday.ts
 ```
+Also you can edit song names in chapter file and mux everything with mkvmerge.
 
 ### Note on ac3 muxing
 Audio in ac3 stream can be slightly out of sync with ts. The best method is to extract first minute or so, find the exact delay (you can do it automatically and prescisely [with my other project](https://github.com/banteg/audos)), then fix ac3 with [delaycut](http://www.videohelp.com/software/delaycut) and finally mux with ffmpeg.

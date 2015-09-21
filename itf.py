@@ -97,9 +97,10 @@ def main(day, artist, quality, dump, proxy, chapters):
         click.secho('Saved chapters to {}'.format(chapters_name), fg='green')
 
     if dump:
-        with open('{}.txt'.format(output), 'wt') as f:
-            f.write('\n'.join(files))
-        click.secho('Dumped {} parts to {}.txt'.format(total, output), fg='green')
+        m3u8_name = '{}'.format(output.replace(ext, '.m3u8'))
+        with open(m3u8_name, 'wt') as f:
+            f.write(m3u8.text)
+        click.secho('Saved HLS playlist to {}'.format(m3u8_name), fg='green')
         return
 
     click.echo('Downloading {} parts to {}'.format(total, output))

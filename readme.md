@@ -42,6 +42,12 @@ cat *.ts > andraday.ts
 ```
 Also you can edit song names in chapter file and mux everything with mkvmerge.
 
+### Sound problem fix
+There is known sound stuttering problem with resulting ts files. To fix it remux file to mp4 and apply aac_adtstoasc bitstream filter:
+```
+ffmpeg -i v.ts -absf aac_adtstoasc -c copy out.mp4
+```
+
 ### Note on ac3 muxing
 Audio in ac3 stream can be slightly out of sync with ts. The best method is to extract first minute or so, find the exact delay (you can do it automatically and prescisely [with my other project](https://github.com/banteg/audos)), then fix ac3 with [delaycut](http://www.videohelp.com/software/delaycut) and finally mux with ffmpeg.
 

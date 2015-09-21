@@ -2,6 +2,9 @@ from __future__ import unicode_literals
 import requests
 import click
 import sys
+import re
+from itertools import groupby
+from operator import itemgetter
 
 QUALITY = {
     '1080p': ('8500_256', '.ts'),
@@ -24,6 +27,24 @@ def get_artist_id(artist):
 
     id_artist = '{}_{}'.format(id, artist)
     return id_artist
+
+
+def generate_chapters(m3u8):
+    songs = re.findall('#EXTINF:(.*),\r\n.*song(\d+).*\r\n', m3u8, re.MULTILINE)
+    songtimes = [0]
+    for song, segments in groupby(songs, itemgetter(1)):
+        segment_len = sum(map(float, list(zip(*segments))[0]))
+        songtimes.append(songtimes[-1] + segment_len)
+
+    chapters = []
+    chapter_t = 'CHAPTER{0:02d}={1}\nCHAPTER{0:02d}NAME=Song {0}'
+    for n, chapter in enumerate(songtimes, 1):
+        h, m = divmod(chapter, 3600)
+        m, s = divmod(m, 60)
+        chaps = ('{:02d}:{:02d}:{:06.3f}'.format(int(h), int(m), s))
+        chapters.append(chapter_t.format(n, chaps))
+
+    return '\n'.join(chapters)
 
 
 @click.command()

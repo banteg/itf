@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='itf',
-    version='2.1',
+    version='2.1.1',
     description='Download Apple Music Festival 2015 Streams',
     url='https://github.com/banteg/itf',
     py_modules=['itf'],

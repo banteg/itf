@@ -45,12 +45,12 @@ def main(day, artist, quality, dump, proxy):
     if '_' not in artist:
         artist = get_artist_id(artist)
 
-    token = requests.get('https://itunes.apple.com/apps1b/authtoken/token.txt', proxies=proxies).text
+    token = requests.get('https://itunes.apple.com/apps1b/authtoken/token.txt', proxies=proxies).text.strip()
     cookies = {'token': token}
 
     if dump:
         with open('token.txt', 'wt') as f:
-            f.write('token={}'.format(token.strip()))
+            f.write('token={}'.format(token))
 
     output = '{}_{}_{}{}'.format(day, artist, quality, ext)
 

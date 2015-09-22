@@ -5,6 +5,10 @@ Install [Python 3](https://www.python.org/downloads/), launch terminal and type:
 ```
 pip install -U itf
 ```
+On Linux type:
+```
+sudo pip3 install -U itf
+```
 
 ### Usage
 `itf --help` display help

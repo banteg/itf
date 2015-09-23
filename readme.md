@@ -22,7 +22,7 @@ sudo pip3 install -U itf
 
 `-d or --dump` dump token and parts instead of downloading, useful if you don't like sequential downloads
 
-`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it all with mkvmerge
+`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it all with Yamb
 
 ### Examples
 To download AC3 audio stream for Ellie Goulding, type

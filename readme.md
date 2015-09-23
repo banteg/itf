@@ -41,24 +41,12 @@ itf 19 andraday 720p --dump --chapters
 ```
 Then you can download and merge parts:
 ```
-aria2c -c -j 10 --header="Cookie: {token.txt}" -i parts.txt
+aria2c -c -j 10 --header="Cookie: {contents of token.txt}" -i parts.txt
 cat *.ts > andraday.ts
 ```
 Also you can edit song names in chapter file and mux everything with mkvmerge.
 
-### Sound problem fix
-There is known sound stuttering problem with resulting ts files. To fix it remux file to mp4 and apply aac_adtstoasc bitstream filter:
-```
-ffmpeg -i v.ts -absf aac_adtstoasc -c copy out.mp4
-```
+### Notes
+It might be a good idea to remux *ts* file to *mp4* with [Yamb](http://www.videohelp.com/software/YAMB) or similar software.
 
-### Note on ac3 muxing
-Audio in ac3 stream can be slightly out of sync with ts. The best method is to extract first minute or so, find the exact delay (you can do it automatically and prescisely [with my other project](https://github.com/banteg/audos)), then fix ac3 with [delaycut](http://www.videohelp.com/software/delaycut) and finally mux with ffmpeg.
-
-```
-ffmpeg -i v.ts -t 60 v.wav
-ffmpeg -i a.ac3 -t 60 a.wav
-audos v.wav a.wav
-delaycut
-ffmpeg -i v.ts -i a_cut.ac3 -map 0:0 -map 0:1 -map 1 -absf aac_adtstoasc -c copy out.mp4
-```
+Audio in *ac3* stream can be slightly out of sync. Delay/rush can be fixed with [delaycut](http://www.videohelp.com/software/delaycut).

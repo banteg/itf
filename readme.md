@@ -22,7 +22,7 @@ sudo pip3 install -U itf
 
 `-d or --dump` dump token and parts instead of downloading, useful if you don't like sequential downloads
 
-`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it all with Yamb
+`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it all with [Yamb](http://www.videohelp.com/software/YAMB)
 
 ### Examples
 To download AC3 audio stream for Ellie Goulding, type
@@ -44,9 +44,9 @@ Then you can download and merge parts:
 aria2c -c -j 10 --header="Cookie: {contents of token.txt}" -i parts.txt
 cat *.ts > andraday.ts
 ```
-Also you can edit song names in chapter file and mux everything with mkvmerge.
+Also you can edit song names in chapter file and mux everything with Yamb.
 
 ### Notes
-It might be a good idea to remux *ts* file to *mp4* with [Yamb](http://www.videohelp.com/software/YAMB) or similar software.
+It might be a good idea to remux *ts* file to *mp4* with Yamb or similar software.
 
 Audio in *ac3* stream can be slightly out of sync. Delay/rush can be fixed with [delaycut](http://www.videohelp.com/software/delaycut).

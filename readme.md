@@ -24,6 +24,8 @@ sudo pip3 install -U itf
 
 `-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it (see below).
 
+`-j or --threads` downloading using multiple threads (1–1000, default: 20)
+
 ### Examples
 To download AC3 audio stream for Ellie Goulding, type
 ```

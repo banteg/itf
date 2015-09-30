@@ -20,35 +20,33 @@ sudo pip3 install -U itf
 
 `-p or --proxy` use http proxy, useful if performances are unavailable in your country
 
-`-d or --dump` dump token and parts instead of downloading, useful if you don't like sequential downloads
+`-d or --dump` dump token and parts instead of downloading, combine with `-c` to skip downloading and save chapters
 
-`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it (see below).
+`-c or --chapters` save chapters file, note that you'll need to add song names manually and then mux it (see below)
 
-`-j or --threads` downloading using multiple threads (1–1000, default: 20)
+`-j or --threads` select number of download threads (1–1000, default: 20)
 
 ### Examples
-To download AC3 audio stream for Ellie Goulding, type
+To download The Chemical Brothers in 1080p, type:
 ```
-itf 19 elliegoulding ac3
-```
-
-To download 1080p performance of Take That via Tor, type:
-```
-itf 20 takethat -p 127.0.0.1:9050
+itf 24 thechemicalbrothers
 ```
 
-To dump hls playlist, urls and chapters for later use, type:
+To download 6-channel audio for Pharrell Williams, type:
 ```
-itf 19 andraday 720p --dump --chapters
+itf 26 pharrellwilliams ac3
 ```
-Then you can download and merge parts:
+
+To dump chapters of Take That via Tor, type:
 ```
-aria2c -c -j 10 -d parts --header="Cookie: {contents of token.txt}" -i parts.txt
-cat parts/*.ts > video.ts
+itf 20 takethat --dump --chapters -p 127.0.0.1:9050
 ```
-Also you can edit song names in chapter file and mux everything with with [Yamb](http://www.videohelp.com/software/YAMB) (on Windows) or [Subler](http://videohelp.com/software/Subler) (on Mac).
 
 ### Notes
-It might be a good idea to remux `.ts` file to `.mp4`, use Yamb or Subler, don't use ffmpeg.
+Complete list of concerts [is here](https://github.com/banteg/itf/issues/3#issuecomment-142756300).
+
+It might be a good idea to remux `.ts` file to `.mp4`, use [Yamb](http://www.videohelp.com/software/YAMB) (on Windows) or [Subler](http://videohelp.com/software/Subler) (on Mac), don't use ffmpeg.
+
+You may want to edit song names in chapter file and mux everything with with Yamb or Subler.
 
 Audio in `.ac3` stream might be slightly out of sync. Delay/rush can be fixed with [delaycut](http://www.videohelp.com/software/delaycut).

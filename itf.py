@@ -3,8 +3,10 @@ import requests
 import click
 import sys
 import re
+import os
 from itertools import groupby
 from operator import itemgetter
+from concurrent.futures import ThreadPoolExecutor
 
 QUALITY = {
     '1080p': ('8500_256', '.ts'),
@@ -63,6 +65,15 @@ def save_dump(token, basename, m3u8, urls):
     return
 
 
+def download_part(args):
+    url, cookies, proxies = args
+    name = url.split('/')[-1]
+    data = requests.get(url, cookies=cookies, proxies=proxies)
+    with open(name, 'wb') as f:
+        f.write(data.content)
+    return name
+
+
 @click.command()
 @click.argument('day', type=click.IntRange(19, 28))
 @click.argument('artist')
@@ -70,7 +81,8 @@ def save_dump(token, basename, m3u8, urls):
 @click.option('--dump', '-d', is_flag=True, help='dump instead of downloading')
 @click.option('--proxy', '-p', help='use http proxy')
 @click.option('--chapters', '-c', is_flag=True, help='generate chapters')
-def main(day, artist, quality, dump, proxy, chapters):
+@click.option('--threads', '-j', default=20, type=click.IntRange(1, 1000))
+def main(day, artist, quality, dump, proxy, chapters, threads):
     '''
     Apple Music Festival 2015 Downloader
     '''
@@ -119,11 +131,16 @@ def main(day, artist, quality, dump, proxy, chapters):
 
     open(output, 'w').close()
 
-    with click.progressbar(part_urls, show_pos=True) as bar:
-        for c, part in enumerate(bar, 1):
-            data = requests.get(part, cookies=cookies, proxies=proxies)
+    pool = ThreadPoolExecutor(threads)
+    parts = [(url, cookies, proxies) for url in part_urls]
+    tasks = pool.map(download_part, parts)
+    with click.progressbar(tasks, length=len(parts), show_pos=True) as bar:
+        for name in bar:
+            with open(name, 'rb') as f:
+                data = f.read()
             with open(output, 'ab') as f:
-                f.write(data.content)
+                f.write(data)
+            os.unlink(name)
 
     click.secho('Done! Enjoy the show.', fg='green')
     click.secho('\nHave an idea? https://github.com/banteg/itf')

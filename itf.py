@@ -66,9 +66,9 @@ def save_dump(token, basename, m3u8, urls):
 
 
 def download_part(args):
-    url, cookies, proxies = args
+    url, s = args
     name = url.split('/')[-1]
-    data = requests.get(url, cookies=cookies, proxies=proxies)
+    data = s.get(url)
     with open(name, 'wb') as f:
         f.write(data.content)
     return name
@@ -131,9 +131,16 @@ def main(day, artist, quality, dump, proxy, chapters, threads):
 
     open(output, 'w').close()
 
+    s = requests.Session()
+    s.cookies.update(cookies)
+    s.proxies.update(proxies)
+    a = requests.adapters.HTTPAdapter(max_retries=10)
+    s.mount('http://', a)
+
     pool = ThreadPoolExecutor(threads)
-    parts = [(url, cookies, proxies) for url in part_urls]
+    parts = [(url, s) for url in part_urls]
     tasks = pool.map(download_part, parts)
+
     with click.progressbar(tasks, length=len(parts), show_pos=True) as bar:
         for name in bar:
             with open(name, 'rb') as f:
